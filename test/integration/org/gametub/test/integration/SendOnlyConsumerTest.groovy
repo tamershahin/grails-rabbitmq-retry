@@ -13,6 +13,7 @@ class SendOnlyConsumerTest extends MessageConsumerIntegrationTest {
 	DeadLettersOnlyConsumer deadLettersOnlyConsumer
 
 	def setup() {
+//		todo: inject ConsumerIntegrationTestRecording feature in metaclass, it's just for testing purposes..
 		sendOnlyConsumer.lastMessage = null
 		deadLettersOnlyConsumer.lastMessage = null
 	}
