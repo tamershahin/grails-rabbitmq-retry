@@ -2,11 +2,9 @@ package org.gametube.test
 
 import com.budjb.rabbitmq.consumer.AutoAck
 import com.budjb.rabbitmq.consumer.MessageContext
-import com.budjb.rabbitmq.publisher.RabbitMessageProperties
-import com.budjb.rabbitmq.publisher.RabbitMessagePublisher
 import org.apache.log4j.Logger
 import org.gametube.integration.test.ConsumerIntegrationTestRecording
-import org.gametube.integration.test.RetryHandler
+import org.gametube.retry.RetryHandler
 
 class SendOnlyConsumer extends ConsumerIntegrationTestRecording implements RetryHandler{
 

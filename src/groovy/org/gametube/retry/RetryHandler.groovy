@@ -1,4 +1,4 @@
-package org.gametube.integration.test
+package org.gametube.retry
 
 import com.budjb.rabbitmq.consumer.MessageContext
 import com.budjb.rabbitmq.publisher.RabbitMessageProperties
