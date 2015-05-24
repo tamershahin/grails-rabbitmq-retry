@@ -6,6 +6,9 @@ import org.apache.log4j.Logger
 import org.gametube.integration.test.ConsumerIntegrationTestRecording
 import org.gametube.retry.RetryHandler
 
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
 class SendOnlyConsumer extends ConsumerIntegrationTestRecording implements RetryHandler{
 
 	/**
@@ -22,8 +25,10 @@ class SendOnlyConsumer extends ConsumerIntegrationTestRecording implements Retry
 			//	Since the Channel is passed in the MessageContext, the author has full control over committing and rolling back transactions.
 	]
 
-	Logger log = Logger.getLogger(SendOnlyConsumer)
+	//to be moved in ConsumerAdapter.. cannot be inside the trait
+	ExecutorService executor = Executors.newFixedThreadPool(10)
 
+	Logger log = Logger.getLogger(SendOnlyConsumer)
 
 	/**
 	 * Handle an incoming RabbitMQ message.

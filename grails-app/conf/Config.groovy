@@ -104,7 +104,8 @@ log4j.main = {
 
 	debug 'grails.app.services',
 			'grails.app.controllers',
-			'org.gametube.test'
+			'org.gametube.test',
+			'org.gametube.retry'
 	
 }
 

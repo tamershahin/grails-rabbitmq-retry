@@ -3,17 +3,22 @@ package org.gametube.retry
 import com.budjb.rabbitmq.consumer.MessageContext
 import com.budjb.rabbitmq.publisher.RabbitMessageProperties
 import com.budjb.rabbitmq.publisher.RabbitMessagePublisher
+import org.apache.catalina.Executor
+
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 /**
  * Created by tamer on 25/02/15.
  */
 trait RetryHandler {
 
-	RabbitMessagePublisher rabbitMessagePublisher
-
 	long initialWaitMillis = 3000
 	long maxWaitMillis = 60000
 	int maxAttempts = 3
+
+	RabbitMessagePublisher rabbitMessagePublisher
+
 
 	def onSuccess(MessageContext context) {
 		log.debug('RetryHandler : message handled with no exception. now acking:' + context.envelope.deliveryTag)
@@ -42,22 +47,18 @@ trait RetryHandler {
 			Long currentWaitMillis = (initialWaitMillis * (Math.pow(2, header.retryMetadata.attempts)))
 			Long sleepInterval = (currentWaitMillis > maxWaitMillis) ? maxWaitMillis : currentWaitMillis
 
-			// perform the sleep
-			log.debug("RetryHandler: sleeping for ${sleepInterval} millis")
-			Thread.sleep(sleepInterval)
-			log.debug("RetryHandler: done sleeping for ${sleepInterval} millis")
-
-			// update the attempts in the message metadata
-			header.retryMetadata.attempts++
-
 			// resend again to itself with previous state
 			RabbitMessageProperties properties = new RabbitMessageProperties()
 			properties.body = context.body
 			properties.exchange = header.retryMetadata.exchange
 			properties.routingKey = header.retryMetadata.routingKey
 			properties.headers = header
+			properties.channel = context.channel
 
-			rabbitMessagePublisher.send(properties)
+			RabbitRetryRunnable retryRunnable = new RabbitRetryRunnable(rabbitMessagePublisher, properties, sleepInterval)
+			executor.execute(retryRunnable)
+
+
 		} else {
 			// no more attemps, nack(ing) to make the queue send the message
 			// to dead letter exchange
